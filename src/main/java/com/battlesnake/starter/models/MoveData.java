@@ -3,6 +3,13 @@ package com.battlesnake.starter.models;
 public class MoveData {
     public int turn;
     public BoardData board;
+    public GameData game;
+    public SnakeData you;
+
+    class GameData {
+        public String id;
+        public int timeout;
+    }
 
     class BoardData {
         public int height;
