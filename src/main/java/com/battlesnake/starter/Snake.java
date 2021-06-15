@@ -1,13 +1,16 @@
 package com.battlesnake.starter;
 
+import com.battlesnake.starter.models.MoveData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.jpackage.internal.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -89,49 +92,21 @@ public class Snake {
             }
         }
 
-    
-        /**
-         * This method is called everytime your Battlesnake is entered into a game.
-         * 
-         * Use this method to decide how your Battlesnake is going to look on the board.
-         *
-         * @return a response back to the engine containing the Battlesnake setup
-         *         values.
-         */
         public Map<String, String> index() {         
             Map<String, String> response = new HashMap<>();
             response.put("apiversion", "1");
-            response.put("author", "");           // TODO: Your Battlesnake Username
-            response.put("color", "#888888");     // TODO: Personalize
-            response.put("head", "default");  // TODO: Personalize
-            response.put("tail", "default");  // TODO: Personalize
+            response.put("author", "davidhowe");
+            response.put("color", "#ef476f");
+            response.put("head", "caffeine");
+            response.put("tail", "coffee");
             return response;
         }
 
-        /**
-         * This method is called everytime your Battlesnake is entered into a game.
-         * 
-         * Use this method to decide how your Battlesnake is going to look on the board.
-         *
-         * @param startRequest a JSON data map containing the information about the game
-         *                     that is about to be played.
-         * @return responses back to the engine are ignored.
-         */
         public Map<String, String> start(JsonNode startRequest) {
             LOG.info("START");
             return EMPTY;
         }
 
-        /**
-         * This method is called on every turn of a game. It's how your snake decides
-         * where to move.
-         * 
-         * Valid moves are "up", "down", "left", or "right".
-         *
-         * @param moveRequest a map containing the JSON sent to this snake. Use this
-         *                    data to decide your next move.
-         * @return a response back to the engine containing Battlesnake movement values.
-         */
         public Map<String, String> move(JsonNode moveRequest) {
             try {
                 LOG.info("Data: {}", JSON_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(moveRequest));
@@ -139,13 +114,12 @@ public class Snake {
                 e.printStackTrace();
             }
 
-            /*
-                Example how to retrieve data from the request payload:
-
-                String gameId = moveRequest.get("game").get("id").asText();
-                int height = moveRequest.get("board").get("height").asInt();
-
-            */
+            try {
+                MoveData moveData = new ObjectMapper().readValue(new ObjectMapper().writeValueAsString(moveRequest), MoveData.class);
+                LOG.info("turn=", moveData.turn);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             String[] possibleMoves = { "up", "down", "left", "right" };
 
